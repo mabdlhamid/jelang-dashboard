@@ -9,7 +9,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class StatsOverview extends BaseWidget
 {
     // Only visible to Owner
-
+    
      protected static bool $isLazy = true;           // 👈 ADD
     protected static ?string $pollingInterval = null; // 👈 ADD
 

@@ -1,0 +1,41 @@
+/* Premium Stat Card Variants */
+.stat-card-success {
+    background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%) !important;
+    border-left: 4px solid #10b981 !important;
+}
+
+.stat-card-info {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%) !important;
+    border-left: 4px solid #3b82f6 !important;
+}
+
+.stat-card-warning {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
+    border-left: 4px solid #f59e0b !important;
+}
+
+.stat-card-danger {
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%) !important;
+    border-left: 4px solid #ef4444 !important;
+}
+
+.dark .stat-card-success,
+.dark .stat-card-info,
+.dark .stat-card-warning,
+.dark .stat-card-danger {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    border-left-width: 4px !important;
+}
+
+/* Card Hover Effects */
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive Text Sizing */
+@media (max-width: 640px) {
+    .fi-wi-stats-overview-stat-value {
+        @apply text-2xl;
+    }
+}

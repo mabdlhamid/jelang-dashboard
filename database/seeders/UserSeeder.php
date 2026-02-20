@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     {
         // Create Admin user
         User::create([
-            'name' => 'Admin Cashier',
+            'name' => 'Admin Kasir',
             'email' => 'admin@cafe.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
 
         // Create Owner user
         User::create([
-            'name' => 'Café Owner',
+            'name' => 'Cafe Owner',
             'email' => 'owner@cafe.com',
             'password' => Hash::make('password'),
             'role' => 'owner',

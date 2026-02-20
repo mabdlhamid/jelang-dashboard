@@ -76,7 +76,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>☕ Cafe BI Dashboard</h1>
+        <h1>☕ JELANG KOFFIE</h1>
         <h2>Laporan Kuangan</h2>
         <p>Period: {{ \Carbon\Carbon::parse($startDate)->timezone('Asia/Makassar')->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->timezone('Asia/Makassar')->format('d M Y') }}</p>        <p>Generated: {{ now()->timezone('Asia/Makassar')->format('d M Y, H:i') }} WITA</p>
     <div class="summary">

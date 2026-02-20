@@ -26,24 +26,34 @@ class DailyStatsOverview extends BaseWidget
         $summary = Sale::getTodaySummary();
     $isClosed = DailyClosing::isCurrentlyClosed(); // 👈 CHANGED THIS
 
-        return [
-            Stat::make('Pendapatan Hari Ini', 'Rp ' . number_format($summary['total_revenue'], 0, ',', '.'))
-                ->description($isClosed ? '🔒 Kas Ditutup' : '✅ Aktif')
-                ->descriptionIcon($isClosed ? 'heroicon-m-lock-closed' : 'heroicon-m-check-circle')
-                ->color($isClosed ? 'danger' : 'success')
-                ->chart([7, 3, 4, 5, 6, 3, 5]),
+           return [
+        Stat::make('💵 Pendapatan Hari Ini', 'Rp ' . number_format($summary['total_revenue'], 0, ',', '.'))
+            ->description($isClosed ? '🔒 Kas sudah ditutup' : '✅ Kas sedang aktif')
+            ->descriptionIcon($isClosed ? 'heroicon-m-lock-closed' : 'heroicon-m-check-circle')
+            ->color($isClosed ? 'danger' : 'success')
+            ->chart([8, 12, 10, 15, 13, 18, 16, 20])
+            ->extraAttributes([
+                'class' => $isClosed ? 'stat-card-danger' : 'stat-card-success',
+            ]),
 
-            Stat::make('Transaksi Hari Ini', number_format($summary['total_transactions']))
-                ->description('Total penjualan hari ini')
-                ->descriptionIcon('heroicon-m-shopping-cart')
-                ->color('info')
-                ->chart([3, 5, 3, 7, 4, 5, 6]),
+        Stat::make('🧾 Transaksi Hari Ini', number_format($summary['total_transactions']))
+            ->description('Total penjualan hari ini')
+            ->descriptionIcon('heroicon-m-receipt-percent')
+            ->color('info')
+            ->chart([5, 8, 6, 10, 8, 12, 11, 14])
+            ->extraAttributes([
+                'class' => 'stat-card-info',
+            ]),
 
-            Stat::make('Barang Terjual Hari Ini', number_format($summary['total_items']))
-                ->description('Total kuantitas')
-                ->descriptionIcon('heroicon-m-squares-2x2')
-                ->color('warning')
-                ->chart([5, 6, 3, 7, 3, 4, 5]),
-        ];
+        Stat::make('📦 Barang Terjual Hari Ini', number_format($summary['total_items']))
+            ->description('Total kuantitas hari ini')
+            ->descriptionIcon('heroicon-m-shopping-bag')
+            ->color('warning')
+            ->chart([10, 15, 12, 18, 16, 22, 20, 25])
+            ->extraAttributes([
+                'class' => 'stat-card-warning',
+            ]),
+    ];
+
     }
 }

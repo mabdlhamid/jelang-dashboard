@@ -5,46 +5,69 @@ namespace App\Filament\Widgets;
 use App\Models\Sale;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 
 class PeakTransactionHoursChart extends ChartWidget
 {
     protected static ?string $heading = 'Peak Transaction Hours';
-
     protected static string $color = 'warning';
+    protected static ?int $sort = 5;
+    protected static bool $isLazy = true;
 
-    protected static ?int $sort = 4;
-
-    protected static bool $isLazy = true;           // 👈 ADD
-    protected static ?string $pollingInterval = null; // 👈 ADD
-
-    public static function canView(): bool           // 👈 ADD
+    public static function canView(): bool
     {
         return auth()->user()->isOwner();
     }
 
+    // Filter properties
+    public ?string $filterType = 'date';
+    public ?string $filterDate = null;
+    public ?int $filterMonth = null;
+    public ?int $filterYear = null;
+
+    public function mount(): void
+    {
+        $this->filterDate = now()->toDateString();
+        $this->filterMonth = now()->month;
+        $this->filterYear = now()->year;
+    }
+
+    #[On('filter-updated')]
+    public function updateFilter($data): void
+    {
+        $this->filterType = $data['type'];
+        $this->filterDate = $data['date'];
+        $this->filterMonth = $data['month'];
+        $this->filterYear = $data['year'];
+    }
+
     protected function getData(): array
     {
-        // Get transaction count by hour
-        $hourlyData = Sale::select(
+        $query = Sale::select(
                 DB::raw('HOUR(transaction_date) as hour'),
                 DB::raw('COUNT(*) as transaction_count')
             )
-            ->where('payment_status', 'paid')
-            ->groupBy('hour')
+            ->where('payment_status', 'paid');
+
+        // Apply filter
+        match ($this->filterType) {
+            'date' => $query->whereDate('transaction_date', $this->filterDate),
+            'month' => $query->whereMonth('transaction_date', $this->filterMonth)
+                            ->whereYear('transaction_date', $this->filterYear),
+            'year' => $query->whereYear('transaction_date', $this->filterYear),
+            default => $query->whereDate('transaction_date', now()),
+        };
+
+        $hourlyData = $query->groupBy('hour')
             ->orderBy('hour', 'asc')
             ->get();
 
-        // Prepare all 24 hours
         $labels = [];
         $data = [];
 
         for ($hour = 0; $hour < 24; $hour++) {
             $labels[] = sprintf('%02d:00', $hour);
-            
-            $hourData = $hourlyData->first(function ($item) use ($hour) {
-                return $item->hour == $hour;
-            });
-            
+            $hourData = $hourlyData->first(fn ($item) => $item->hour == $hour);
             $data[] = $hourData ? $hourData->transaction_count : 0;
         }
 
@@ -65,30 +88,5 @@ class PeakTransactionHoursChart extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
-    }
-
-    protected function getOptions(): array
-    {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => false,
-                ],
-            ],
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'ticks' => [
-                        'precision' => 0,
-                    ],
-                ],
-                'x' => [
-                    'ticks' => [
-                        'maxRotation' => 45,
-                        'minRotation' => 45,
-                    ],
-                ],
-            ],
-        ];
     }
 }

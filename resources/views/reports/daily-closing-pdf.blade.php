@@ -82,7 +82,7 @@
 <body>
 
     <div class="header">
-        <h1>☕ Café BI Dashboard</h1>
+        <h1>☕ JELANG KOFFIE</h1>
         <h2>Laporan Harian - Hari Operasional #{{ $closing->operating_day }}</h2>
         <p>Tanggal: {{ $closing->closing_date->timezone('Asia/Makassar')->locale('id')->isoFormat('dddd, D MMMM Y') }}</p>
     </div>

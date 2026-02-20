@@ -1,83 +1,96 @@
 <x-filament-panels::page>
 
+    @php
+        $user = auth()->user();
+        $hour = now()->timezone('Asia/Makassar')->hour;
+
+        $timeGreeting = match(true) {
+            $hour >= 5 && $hour < 12 => 'Selamat Pagi',
+            $hour >= 12 && $hour < 15 => 'Selamat Siang',
+            $hour >= 15 && $hour < 18 => 'Selamat Sore',
+            default => 'Selamat Malam',
+        };
+
+        $roleLabel = $user->isOwner() ? 'Owner' : 'Admin';
+
+        $description = $user->isOwner()
+            ? 'Berikut adalah ringkasan performa bisnis cafe Anda'
+            : 'Siap memulai aktivitas operasional hari ini';
+
+        $isClosed = $user->isAdmin()
+            ? \App\Models\DailyClosing::isCurrentlyClosed()
+            : null;
+    @endphp
+
     {{-- Welcome Header --}}
     <div class="rounded-2xl overflow-hidden shadow-lg mb-6"
         style="background: linear-gradient(135deg, #f8b400 0%, #f59e0b 50%, #d97706 100%);">
-        <div class="px-8 py-6 flex items-center justify-between">
 
-            {{-- Left: Logo + Welcome Text --}}
-            <div class="flex items-center gap-5">
+        {{-- ... existing welcome header code ... --}}
 
-                {{-- Café Logo --}}
-                <div class="flex-shrink-0">
-                    <img
-                        src="{{ asset('images/logo.png') }}"
-                        alt="Café Logo"
-                        class="h-16 w-16 rounded-full object-cover shadow-md border-2 border-white"
-                        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
-                    >
-                    {{-- Fallback if no logo --}}
-                    <div id="logo-fallback"
-                        style="display:none; width:64px; height:64px; background:white; border-radius:50%; align-items:center; justify-content:center; font-size:28px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-                        ☕
-                    </div>
-                </div>
+    </div>
 
-                {{-- Welcome Text --}}
+    {{-- Greeting Section --}}
+    <x-filament::section>
+
+        <div class="flex items-center justify-between">
+
+            <div class="flex items-center gap-4">
+
+                @if(file_exists(public_path('images/logo.png')))
+                    <img src="{{ asset('images/logo.png') }}"
+                        alt="Logo"
+                        class="w-12 h-12 rounded-lg object-contain">
+                @endif
+
                 <div>
-                    @if(auth()->user()->isOwner())
-                        <h1 class="text-2xl font-bold text-white">
-                            Selamat Datang, Owner! 👋
-                        </h1>
-                        <p class="text-yellow-100 text-sm mt-1">
-                            Berikut adalah ringkasan bisnis café Anda hari ini.
-                        </p>
-                    @else
-                        <h1 class="text-2xl font-bold text-white">
-                            Selamat Datang, Admin! 👋
-                        </h1>
-                        <p class="text-yellow-100 text-sm mt-1">
-                            Siap memulai aktivitas kasir hari ini?
-                        </p>
-                    @endif
+                    <h2 class="text-xl font-bold">
+                        {{ $timeGreeting }}, {{ $user->name }}
+                    </h2>
+
+                    <p class="text-sm text-gray-500">
+                        {{ $description }}
+                    </p>
                 </div>
             </div>
 
-            {{-- Right: Date + Time + Status --}}
-            <div class="text-right hidden md:block">
-                <div class="text-white font-semibold text-lg">
+            <div class="text-right text-sm text-gray-500">
+                <div>
                     {{ now()->timezone('Asia/Makassar')->locale('id')->isoFormat('dddd') }}
                 </div>
-                <div class="text-yellow-100 text-sm">
+                <div class="font-semibold text-gray-900 dark:text-white">
                     {{ now()->timezone('Asia/Makassar')->locale('id')->isoFormat('D MMMM Y') }}
                 </div>
-                <div class="text-yellow-100 text-sm mt-1">
-                    🕐 {{ now()->timezone('Asia/Makassar')->format('H:i') }} WITA
-                </div>
-
-                {{-- Admin: Show Day Status --}}
-                @if(auth()->user()->isAdmin())
-                    @php
-                        $isClosed = \App\Models\DailyClosing::isCurrentlyClosed();
-                    @endphp
-                    <div class="mt-2">
-                        @if($isClosed)
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                                🔒 Kas Ditutup
-                            </span>
-                        @else
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                ✅ Kas Aktif
-                            </span>
-                        @endif
-                    </div>
-                @endif
             </div>
 
         </div>
-    </div>
 
-    {{-- Widgets --}}
+        {{-- Badges --}}
+        <div class="flex items-center gap-2 mt-3 ml-6">
+
+            <x-filament::badge>
+                {{ $roleLabel }}
+            </x-filament::badge>
+
+            @if($user->isAdmin() && $isClosed !== null)
+                <x-filament::badge :color="$isClosed ? 'danger' : 'success'">
+                    {{ $isClosed ? 'Kas Ditutup' : 'Kas Aktif' }}
+                </x-filament::badge>
+            @endif
+
+        </div>
+
+    </x-filament::section>
+
+    {{-- ✅ FILTER (POSISI IDEAL) --}}
+   @if($user->isOwner())
+    <div class="mb-6">
+        @livewire('analytics-filter')
+    </div>
+@endif
+
+
+    {{-- ✅ Widgets (HANYA SEKALI 🔥) --}}
     <x-filament-widgets::widgets
         :widgets="$this->getWidgets()"
         :columns="$this->getColumns()"

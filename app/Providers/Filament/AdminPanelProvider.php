@@ -22,6 +22,8 @@ use App\Filament\Widgets\MonthlySalesChart;
 use App\Filament\Widgets\PeakTransactionHoursChart;
 use App\Filament\Widgets\DailyStatsOverview;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\OwnerStatsOverview;
+use App\Filament\Widgets\BusinessInsights;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -29,12 +31,12 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('admin')
+            ->id(id: 'admin')
             ->path('admin')
             ->login()
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('2.5rem')
-            ->brandName('Café BI Dashboard')
+            ->brandName('Jelang Koffie')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -45,11 +47,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             // ✅ NO discoverWidgets - register manually only
             ->widgets([
+    
                 DailyStatsOverview::class,      // Admin only (canView checks role)
-                StatsOverview::class,           // Owner only (canView checks role)
+                OwnerStatsOverview::class,       // 👈 NEW - replaces old StatsOverview
                 BestSellingMenuChart::class,    // Owner only (canView checks role)
                 MonthlySalesChart::class,       // Owner only (canView checks role)
                 PeakTransactionHoursChart::class, // Owner only (canView checks role)
+                BusinessInsights::class,           // 👈 ADD at top
+
             ])
             ->middleware([
                 EncryptCookies::class,
