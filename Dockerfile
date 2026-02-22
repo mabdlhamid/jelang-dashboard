@@ -12,4 +12,4 @@ COPY . .
 
 RUN composer install --ignore-platform-reqs --no-interaction --optimize-autoloader
 
-CMD php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
