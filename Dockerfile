@@ -3,7 +3,7 @@ FROM php:8.2-cli
 RUN apt-get update && apt-get install -y \
     git unzip zip \
     libzip-dev libicu-dev libpng-dev \
-    && docker-php-ext-install intl zip gd
+    && docker-php-ext-install intl zip gd pdo pdo_mysql
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
