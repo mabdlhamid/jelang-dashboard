@@ -18,6 +18,8 @@ class Menu extends Model
     protected $fillable = [
         'name',
         'price',
+        'color',        // 👈 TAMBAH INI
+        'description',
         'category',
     ];
 

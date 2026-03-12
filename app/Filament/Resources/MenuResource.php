@@ -42,12 +42,13 @@ class MenuResource extends Resource
 
                         Forms\Components\Select::make('category')
                             ->options([
-                                'Coffee' => 'Coffee',
-                                'Non-Coffee' => 'Non-Coffee',
-                                'Tea' => 'Tea',
-                                'Food' => 'Food',
                                 'Snack' => 'Snack',
-                                'Dessert' => 'Dessert',
+                                'Makanan' => 'Makanan',
+                                'Rice Bowl' => 'Rice Bowl',
+                                'Coffee' => 'Coffee',
+                                'Non Coffee' => 'Non Coffee',
+                                'Fresh' => 'Fresh',
+                                'Manual Brew' => 'Manual Brew',
                             ])
                             ->required()
                             ->searchable()
@@ -69,12 +70,13 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('category')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Coffee' => 'success',
-                        'Non-Coffee' => 'info',
-                        'Tea' => 'warning',
-                        'Food' => 'danger',
-                        'Snack' => 'gray',
-                        'Dessert' => 'pink',
+                       'Snack' => 'warning',       // 🟡 Orange
+                        'Makanan' => 'danger',      // 🔴 Red
+                        'Rice Bowl' => 'violet',      // 🌸 Pink
+                        'Coffee' => 'success',      // 🟢 Green
+                        'Non Coffee' => 'info',     // 🔵 Blue
+                        'Fresh' => 'primary',       // 🔷 Cyan
+                        'Manual Brew' => 'purple',  // 🟣 Purple
                         default => 'gray',
                     })
                     ->searchable()
@@ -104,12 +106,13 @@ class MenuResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
                     ->options([
-                        'Coffee' => 'Coffee',
-                        'Non-Coffee' => 'Non-Coffee',
-                        'Tea' => 'Tea',
-                        'Food' => 'Food',
-                        'Snack' => 'Snack',
-                        'Dessert' => 'Dessert',
+                      'Snack' => 'Snack',
+                                'Makanan' => 'Makanan',
+                                'Rice Bowl' => 'Rice Bowl',
+                                'Coffee' => 'Coffee',
+                                'Non Coffee' => 'Non Coffee',
+                                'Fresh' => 'Fresh',
+                                'Manual Brew' => 'Manual Brew',
                     ]),
             ])
             ->actions([
