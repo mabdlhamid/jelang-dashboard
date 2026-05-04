@@ -29,7 +29,7 @@ class AnalyticsFilter extends Component implements HasForms
     {
         return $form->schema([
             Select::make('filterType')
-                ->label('Filter By')
+                ->label('Filter Berdasarkan')
                 ->options([
                     'date' => 'Specific Date',
                     'month' => 'Month',

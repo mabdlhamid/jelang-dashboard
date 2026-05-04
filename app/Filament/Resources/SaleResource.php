@@ -38,10 +38,10 @@
                         ->schema([
                             Forms\Components\Select::make('menu_id')
                                 ->label('Menu Item')
-                                ->options(Menu::all()->pluck('name', 'id'))
+                                ->options(fn () => Menu::pluck('name', 'id'))                                
                                 ->required()
                                 ->searchable()
-                                ->preload()
+                                ->preload(false)
                                 ->reactive()
                                 ->afterStateUpdated(function ($state, callable $set) {
                                     $menu = Menu::find($state);
@@ -98,6 +98,7 @@
         public static function table(Table $table): Table
         {
             return $table
+                ->query(fn () => Sale::query()->with('menu')) // 🔥 TARUH DI SINI
                 ->columns([
                     Tables\Columns\TextColumn::make('id')
                         ->label('ID')
@@ -200,7 +201,8 @@
                         Tables\Actions\DeleteBulkAction::make(),
                     ]),
                 ])
-                ->defaultSort('transaction_date', 'desc');
+                ->defaultSort('transaction_date', 'desc')
+                ->paginated([10, 25, 50]); // 🔥 TARUH DI SINI
         }
 
         public static function getRelations(): array

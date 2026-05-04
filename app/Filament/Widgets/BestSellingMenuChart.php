@@ -55,11 +55,13 @@ class BestSellingMenuChart extends ChartWidget
             default => $query->whereDate('transaction_date', now()),
         };
 
-        $bestSelling = $query->groupBy('menu_id')
-            ->orderBy('total_sold', 'desc')
-            ->limit(10)
-            ->with('menu')
-            ->get();
+        $bestSelling = $query
+        ->join('menus', 'sales.menu_id', '=', 'menus.id')
+        ->select('menus.name', DB::raw('SUM(quantity) as total_sold'))
+        ->groupBy('menus.name')
+        ->orderBy('total_sold', 'desc')
+        ->limit(10)
+        ->get();
 
         $labels = [];
         $data = [];
