@@ -5,6 +5,7 @@
     use App\Filament\Resources\SaleResource\Pages;
     use App\Models\Sale;
     use App\Models\Menu;
+    use App\Models\User;
     use Filament\Forms;
     use Filament\Forms\Form;
     use Filament\Resources\Resource;
@@ -17,6 +18,8 @@
     use Filament\Tables\Actions\Action;
     use Filament\Forms\Components\DatePicker;
     use App\Models\DailyClosing;
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Database\Eloquent\Model;
 
     class SaleResource extends Resource
     {
@@ -65,7 +68,7 @@
                             Forms\Components\TextInput::make('quantity')
                                 ->required()
                                 ->numeric()
-                                ->default(1)
+                                ->default(0)
                                 ->minValue(1)
                                 ->reactive()
                                 ->afterStateUpdated(function ($state, callable $get, callable $set) {
@@ -187,18 +190,20 @@
                         }),
                 ])
 
-               ->actions([
-                    Tables\Actions\ViewAction::make(),
-                    
-                    Tables\Actions\EditAction::make()
-                        ->hidden(fn ($record) => $record->isLocked()),
-                    
-                    Tables\Actions\DeleteAction::make()
-                        ->hidden(fn ($record) => $record->isLocked()),
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\EditAction::make()
+                    ->visible(fn (Sale $record): bool => self::userIsOwner() && ! $record->isLocked()),
+
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn (Sale $record): bool => self::userIsOwner() && ! $record->isLocked()),
 ])
-                ->bulkActions([
+
+        ->bulkActions([
                     Tables\Actions\BulkActionGroup::make([
-                        Tables\Actions\DeleteBulkAction::make(),
+                        Tables\Actions\DeleteBulkAction::make()
+                            ->visible(fn (): bool => self::userIsOwner()),
                     ]),
                 ])
                 ->defaultSort('transaction_date', 'desc')
@@ -223,24 +228,37 @@
 
         // Only Admin can access this resource
         public static function canViewAny(): bool
-        {
-            return auth()->user()->isAdmin();
-        }
-          public static function canEdit($record): bool
-    {
-        return !$record->isLocked();
-    }
+{
+    return self::userIsOwnerOrAdmin();
+}
 
-    public static function canDelete($record): bool
-    {
-        return !$record->isLocked();
-    }
+public static function canCreate(): bool
+{
+    return self::userIsOwnerOrAdmin();
+}
 
-    public static function canCreate(): bool
-    {
-        return auth()->user()->isAdmin();
-    }
+public static function canEdit($record): bool
+{
+    return self::userIsOwner() && ! $record->isLocked();
+}
 
-        
-    }
-    
+public static function canDelete($record): bool
+{
+    return self::userIsOwner() && ! $record->isLocked();
+}
+
+private static function userIsOwner(): bool
+{
+    $user = Auth::user();
+
+    return $user instanceof User && $user->isOwner();
+}
+
+private static function userIsOwnerOrAdmin(): bool
+{
+    $user = Auth::user();
+
+    return $user instanceof User && ($user->isOwner() || $user->isAdmin());
+}
+
+}
