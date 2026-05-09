@@ -27,17 +27,20 @@
 
         protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
-        protected static ?string $navigationGroup = 'Sales Management';
+        protected static ?string $navigationGroup = 'Manajemen Penjualan';
+        protected static ?string $modelLabel = 'Transaksi';
 
         protected static ?int $navigationSort = 2;
+         protected static ?string $pluralModelLabel = 'Transaksi Penjualan';
 
-        protected static ?string $navigationLabel = 'Sales Transactions';
+        protected static ?string $navigationLabel = 'Transaksi Penjualan';
 
         public static function form(Form $form): Form
         {
             return $form
                 ->schema([
-                    Forms\Components\Section::make('Transaction Details')
+                    Forms\Components\Section::make('Informasi Transaksi')
+                    ->description('Input data transaksi penjualan')
                         ->schema([
                             Forms\Components\Select::make('menu_id')
                                 ->label('Menu Item')
@@ -54,18 +57,8 @@
                                 })
                                 ->columnSpan(2),
 
-                            Forms\Components\DateTimePicker::make('transaction_date')
-                                ->required()
-                                ->default(now())
-                                ->native(false)
-                                ->displayFormat('d/m/Y H:i')
-                                ->seconds(false)
-                                ->columnSpan(2),
-
-                            Forms\Components\Hidden::make('unit_price')
-                                ->default(0),
-
                             Forms\Components\TextInput::make('quantity')
+                                ->label('Jumlah')
                                 ->required()
                                 ->numeric()
                                 ->default(0)
@@ -75,24 +68,54 @@
                                     $unitPrice = $get('unit_price') ?? 0;
                                     $set('total_price', $state * $unitPrice);
                                 }),
+                            
+                            Forms\Components\TextInput::make('unit_price')
+                                ->label('Harga Satuan')
+                                ->prefix('Rp')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated(false),
+
 
                             Forms\Components\TextInput::make('total_price')
-                                ->required()
-                                ->numeric()
+                                ->label('Total Harga')
                                 ->prefix('Rp')
+                                ->numeric()
+                                ->required()
                                 ->disabled()
                                 ->dehydrated()
                                 ->placeholder('Auto calculated'),
 
                             Forms\Components\Select::make('payment_status')
                                 ->options([
-                                    'paid' => 'Paid',
+                                    'paid' => 'Lunas',
                                     'pending' => 'Pending',
-                                    'cancelled' => 'Cancelled',
                                 ])
-                                ->required()
                                 ->default('paid')
+                                ->required()
                                 ->native(false),
+
+                            Forms\Components\Select::make('payment_method')
+                                ->label('Metode Pembayaran')
+                                ->options([
+                                    'cash' => '💵 Tunai',
+                                    'qris' => '📱 QRIS',
+                                    'debit' => '💳 Kartu Debit',
+                                    'credit' => '💳 Kartu Kredit',
+                                    'e-wallet' => '📲 E-Wallet (GoPay/OVO/Dana)',
+                                    'transfer' => '🏦 Transfer Bank',
+                                ])
+                                ->default('cash')
+                                ->required()
+                                ->native(false),
+
+                            Forms\Components\DateTimePicker::make('transaction_date')
+                            ->label('Tanggal & Waktu Transaksi')
+                            ->default(now())
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('d/m/Y H:i')
+                            ->timezone('Asia/Makassar'),
                         ])
                         ->columns(3),
                 ]);
@@ -109,11 +132,10 @@
                         ->toggleable(isToggledHiddenByDefault: true),
 
                     Tables\Columns\TextColumn::make('transaction_date')
+                        ->label('Tanggal & Waktu')
                         ->dateTime('d M Y, H:i')
                         ->timezone('Asia/Makassar')
-                        ->sortable()
-                        ->searchable()
-                        ->description(fn ($record) => $record->transaction_date->timezone('Asia/Makassar')->format('l, d F Y')),
+                        ->sortable(),
 
                     Tables\Columns\TextColumn::make('menu.name')
                         ->label('Menu')
@@ -122,21 +144,66 @@
                         ->weight('bold'),
 
                     Tables\Columns\TextColumn::make('menu.category')
-                        ->label('Category')
+                        ->label('Kategori')
                         ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'Snack' => 'warning',
+                            'Food' => 'info',
+                            'Rice Bowl' => 'rose',
+                            'Coffee' => 'success',
+                            'Non-Coffee' => 'danger',
+                            'Fresh' => 'primary',
+                            'Manual Brew' => 'purple',
+                            'Dessert' => 'info',
+                            'Tea' => 'warning',
+                            default => 'default',
+                        })
                         ->sortable(),
 
                     Tables\Columns\TextColumn::make('quantity')
+                        ->label('Jumlah')
                         ->numeric()
                         ->sortable()
+                        ->alignCenter()
                         ->suffix(' items'),
 
                     Tables\Columns\TextColumn::make('total_price')
+                         ->label('Total Harga')
                         ->money('IDR')
                         ->sortable(),
 
+                    Tables\Columns\TextColumn::make('payment_method')
+                        ->label('Metode Pembayaran')
+                        ->alignCenter()
+                        ->badge()
+                        ->formatStateUsing(fn (string $state): string => match ($state) {
+                            'cash' => '💵 Tunai',
+                            'qris' => '📱 QRIS',
+                            'debit' => '💳 Debit',
+                            'credit' => '💳 Kredit',
+                            'e-wallet' => '📲 E-Wallet',
+                            'transfer' => '🏦 Transfer',
+                            default => $state,
+                        })
+                      ->color(fn (string $state): string => match ($state) {
+                        'cash' => 'success',
+                        'qris' => 'info',
+                        'debit', 'credit' => 'warning',
+                        'e-wallet' => 'primary',
+                        'transfer' => 'gray',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
                     Tables\Columns\TextColumn::make('payment_status')
                         ->badge()
+                        ->label('Status Pembayaran')
+                        ->alignCenter()
+                          ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'paid' => '✅ Lunas',
+                        'pending' => '⏳ Pending',
+                        default => $state,
+                          })
                         ->color(fn (string $state): string => match ($state) {
                             'paid' => 'success',
                             'pending' => 'warning',
@@ -146,7 +213,7 @@
                         ->sortable(),
 
                     Tables\Columns\TextColumn::make('status')
-                        ->label('Lock Status')
+                        ->label('Status Lock')
                         ->badge()
                         ->getStateUsing(fn ($record) => $record->isLocked() ? 'Locked' : 'Active')
                         ->color(fn ($record) => $record->isLocked() ? 'danger' : 'success')
@@ -157,8 +224,10 @@
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: true),
                 ])
+
                 ->filters([
                     Tables\Filters\SelectFilter::make('payment_status')
+                        ->label('Status Pembayaran')
                         ->options([
                             'paid' => 'Paid',
                             'pending' => 'Pending',
@@ -171,6 +240,7 @@
                         ->searchable(),
 
                     Tables\Filters\Filter::make('transaction_date')
+                        ->label('Tanggal Transaksi')
                         ->form([
                             Forms\Components\DatePicker::make('from')
                                 ->label('From Date'),

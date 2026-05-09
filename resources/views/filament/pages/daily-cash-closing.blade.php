@@ -151,7 +151,7 @@
                     icon="heroicon-o-lock-closed"
                     size="lg"
                 >
-                    🔒 Tutup Kas Hari Operasional #{{ $currentOperatingDay }}
+                     Tutup Kas Hari Operasional #{{ $currentOperatingDay }}
                 </x-filament::button>
 
                 <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">

@@ -9,7 +9,7 @@ use Livewire\Attributes\On;
 
 class MonthlySalesChart extends ChartWidget
 {
-    protected static ?string $heading = 'Sales Trend';
+    protected static ?string $heading = 'Tren Penjualan';
     protected static string $color = 'info';
     protected static ?int $sort = 4;
     protected static bool $isLazy = true;

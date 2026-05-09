@@ -20,10 +20,14 @@ class Reports extends Page implements HasForms
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+protected static ?string $title = 'Laporan';
 
-    protected static string $view = 'filament.pages.reports';
+ protected static string $view = 'filament.pages.reports';
 
     protected static ?string $navigationGroup = 'Laporan';
+    protected static ?string $modelLabel = 'Laporan';
+    protected static ?string $navigationLabel = 'Laporan';
+    protected static ?string $pluralModelLabel = 'Laporan';
 
     protected static ?int $navigationSort = 10;
 

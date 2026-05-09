@@ -17,6 +17,12 @@ class MenuResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?string $navigationGroup = 'Menu Management';
+    protected static ?string $modelLabel = 'Menu';
+
+protected static ?string $pluralModelLabel = 'Menu';
+
+    protected static ?string $navigationLabel = 'Menu';
+
 
     protected static ?int $navigationSort = 1;
 
@@ -27,12 +33,14 @@ class MenuResource extends Resource
                 Forms\Components\Section::make('Menu Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
+                        ->label('Nama Menu')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('e.g., Espresso, Cappuccino')
                             ->columnSpan(2),
 
                         Forms\Components\TextInput::make('price')
+                        ->label('Harga')
                             ->required()
                             ->numeric()
                             ->prefix('Rp')
@@ -41,6 +49,7 @@ class MenuResource extends Resource
                             ->minValue(0),
 
                         Forms\Components\Select::make('category')
+                        ->label('Kategori')
                             ->options([
                                 'Snack' => 'Snack',
                                 'Makanan' => 'Makanan',
@@ -63,31 +72,36 @@ class MenuResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                ->label('Nama Menu')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
 
                 Tables\Columns\TextColumn::make('category')
+                ->label('Kategori')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                       'Snack' => 'warning',       // 🟡 Orange
-                        'Makanan' => 'danger',      // 🔴 Red
-                        'Rice Bowl' => 'violet',      // 🌸 Pink
-                        'Coffee' => 'success',      // 🟢 Green
-                        'Non Coffee' => 'info',     // 🔵 Blue
-                        'Fresh' => 'primary',       // 🔷 Cyan
-                        'Manual Brew' => 'purple',  // 🟣 Purple
-                        default => 'gray',
+                         'Snack' => 'warning',
+                            'Food' => 'info',
+                            'Rice Bowl' => 'rose',
+                            'Coffee' => 'success',
+                            'Non-Coffee' => 'danger',
+                            'Fresh' => 'primary',
+                            'Manual Brew' => 'purple',
+                            'Dessert' => 'info',
+                            'Tea' => 'warning',
+                            default => 'default',
                     })
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('price')
+                    ->label('Harga')
                     ->money('IDR')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('total_sold')
-                    ->label('Total Sold')
+                    ->label('Total Terjual')
                     ->numeric()
                     ->sortable()
                     ->default(0)

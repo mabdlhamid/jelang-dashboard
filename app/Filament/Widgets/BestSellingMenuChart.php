@@ -9,7 +9,7 @@ use Livewire\Attributes\On;
 
 class BestSellingMenuChart extends ChartWidget
 {
-    protected static ?string $heading = 'Best-Selling Menu';
+    protected static ?string $heading = 'Menu Terlaris';
     protected static string $color = 'success';
     protected static ?int $sort = 3;
     protected static bool $isLazy = true;
@@ -19,7 +19,7 @@ class BestSellingMenuChart extends ChartWidget
         return auth()->user()->isOwner();
     }
 
-    // Filter properties
+    // Properti filter
     public ?string $filterType = 'date';
     public ?string $filterDate = null;
     public ?int $filterMonth = null;
@@ -46,35 +46,38 @@ class BestSellingMenuChart extends ChartWidget
         $query = Sale::select('menu_id', DB::raw('SUM(quantity) as total_sold'))
             ->where('payment_status', 'paid');
 
-        // Apply filter
+        // Terapkan filter
         match ($this->filterType) {
             'date' => $query->whereDate('transaction_date', $this->filterDate),
+
             'month' => $query->whereMonth('transaction_date', $this->filterMonth)
-                            ->whereYear('transaction_date', $this->filterYear),
+                ->whereYear('transaction_date', $this->filterYear),
+
             'year' => $query->whereYear('transaction_date', $this->filterYear),
+
             default => $query->whereDate('transaction_date', now()),
         };
 
         $bestSelling = $query
-        ->join('menus', 'sales.menu_id', '=', 'menus.id')
-        ->select('menus.name', DB::raw('SUM(quantity) as total_sold'))
-        ->groupBy('menus.name')
-        ->orderBy('total_sold', 'desc')
-        ->limit(10)
-        ->get();
+            ->join('menus', 'sales.menu_id', '=', 'menus.id')
+            ->select('menus.name', DB::raw('SUM(quantity) as total_sold'))
+            ->groupBy('menus.name')
+            ->orderBy('total_sold', 'desc')
+            ->limit(10)
+            ->get();
 
         $labels = [];
         $data = [];
 
         foreach ($bestSelling as $sale) {
-            $labels[] = $sale->menu->name ?? 'Unknown';
+            $labels[] = $sale->name;
             $data[] = $sale->total_sold;
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Quantity Sold',
+                    'label' => 'Jumlah Terjual',
                     'data' => $data,
                     'backgroundColor' => [
                         'rgba(34, 197, 94, 0.7)',
@@ -103,8 +106,20 @@ class BestSellingMenuChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'plugins' => ['legend' => ['display' => false]],
-            'scales' => ['y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0]]],
+            'plugins' => [
+                'legend' => [
+                    'display' => false
+                ]
+            ],
+
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'precision' => 0
+                    ]
+                ]
+            ],
         ];
     }
 }

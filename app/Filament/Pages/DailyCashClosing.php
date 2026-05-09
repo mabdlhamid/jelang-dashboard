@@ -17,16 +17,18 @@ use Illuminate\Support\Facades\Artisan;  // 👈 THIS ONE
 class DailyCashClosing extends Page implements HasForms
 {
     use InteractsWithForms;
+protected static ?string $title = 'Harian Closing';
 
     protected static ?string $navigationIcon = 'heroicon-o-lock-closed';
 
     protected static string $view = 'filament.pages.daily-cash-closing';
 
     protected static ?string $navigationGroup = 'Daily Operations';
-
+    protected static ?string $modelLabel = 'Harian Closing';
+    protected static ?string $pluralModelLabel = 'Harian Closing';
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationLabel = 'Daily Cash Closing';
+    protected static ?string $navigationLabel = 'Harian Closing';
 
     public ?array $data = [];
 
@@ -45,12 +47,12 @@ class DailyCashClosing extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make('Daily Closing Notes')
-                    ->description('Optional notes for this closing')
+                Section::make('Catatan untuk Penutupan Kas Harian')
+                    ->description('Opsi: Tambahkan catatan atau keterangan untuk penutupan kas hari ini. Ini akan membantu dalam pencatatan dan referensi di masa mendatang.')
                     ->schema([
                         Textarea::make('notes')
-                            ->label('Notes')
-                            ->placeholder('Enter any notes or remarks for today\'s closing...')
+                            ->label('catatan')
+                            ->placeholder('Misalnya: Penjualan tinggi karena promo, atau ada kendala teknis pada mesin kasir.')
                             ->rows(3),
                     ]),
             ])

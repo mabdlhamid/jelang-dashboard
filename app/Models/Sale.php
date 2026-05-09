@@ -21,6 +21,9 @@ class Sale extends Model
         'quantity',
         'total_price',
         'payment_status',
+        'payment_method',
+        'transaction_date',
+
     ];
 
     /**

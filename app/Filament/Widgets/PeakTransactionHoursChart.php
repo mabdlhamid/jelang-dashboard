@@ -9,7 +9,7 @@ use Livewire\Attributes\On;
 
 class PeakTransactionHoursChart extends ChartWidget
 {
-    protected static ?string $heading = 'Peak Transaction Hours';
+    protected static ?string $heading = 'Jam Transaksi Terbanyak';
     protected static string $color = 'warning';
     protected static ?int $sort = 5;
     protected static bool $isLazy = true;
